@@ -50,10 +50,14 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailService);
 		// you can also configure with inmemoryAuthentication
-		auth.inMemoryAuthentication()
+	/*	auth.inMemoryAuthentication()
 			.withUser("blah")
 			.password("blah")
-			.roles("USER"); //help in role based authentication
+			.roles("USER") //help in role based authentication
+			.and()		// use method chaining to add more Inmemory users
+			.withUser("foo")
+			.password("foo")
+			.roles("ADMIN");*/
 			
 	//configures the global (parent) AuthenticationManager:	
 	// you have autowire the @Autowired   DataSource dataSource;	
@@ -65,7 +69,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 	@SuppressWarnings("deprecation")
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
+		return NoOpPasswordEncoder.getInstance(); // this actually doing nothing. Should not use in production.
 	}
 	
 	/**
@@ -82,14 +86,25 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 	}
 	
 	/**
+	 * Hold on HttpSecurity to authenticate different endpoint or to authenticated based on their Roll
+	 * e.g /admin for the loggedin used with Role as admin etc.
 	 * Authenticate all request end points except the "/authenticate" end point
 	 * enable session policy (JWT foloows stateless authentication  mechenism) for JWT and register the JWT filter
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests().antMatchers("/authenticate").permitAll().anyRequest().authenticated()
+		http.csrf().disable().authorizeRequests()
+		.antMatchers("/authenticate").permitAll().anyRequest().authenticated()
 		.and().exceptionHandling().and().sessionManagement()
 		.sessionCreationPolicy(SessionCreationPolicy.STATELESS); //enable session creation policy which is stateless
 	http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); //registed filter
+	// Role based or endpoint 
+	// match all endpoint in a order from most restricted to least restricted
+	/*http.authorizeRequests()  
+		.antMatchers("/admin").hasRole("ADMIN") ///admin endpoint for loggedin user with role  'ADMIN'
+		.antMatchers("/users").hasRole("USER") ///users endpoing for logged in user with 'User" role 
+		.antMatchers("/*").permitAll() // for all end points it needs to access login form. Note:never put this first
+		.and().formLogin();*/
+	
 	}
 } 
