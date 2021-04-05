@@ -18,8 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import ca.kirti.jwt.api.filter.JwtFilter;
 import ca.kirti.jwt.api.service.CustomUserDetailService;
 
+/**
+ * This is a web level security class which authenticate the user
+ * @author Kirti
+ * https://spring.io/guides/gs/securing-web/
+ */
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity //tells Spring that this is webSecurity configuration. There is another type security like appliation/method level security
 public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 	
 	
@@ -29,12 +34,32 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 	@Autowired	
 	private CustomUserDetailService userDetailService;
 	
+/*	@Autowired
+	DataSource dataSource; // used with jdbcAuthentication
+	*/
 	/**
 	 * Add the Authentication
+	 * Customizing Authentication Managers.
+	 * Spring Security provides some configuration helpers 
+	 * to quickly get common authentication manager features set up in your application. 
+	 * The most commonly used helper is the AuthenticationManagerBuilder, 
+	 * which is great for setting up in-memory, JDBC, or LDAP user details for adding a custom UserDetailsService
+	 * see : https://spring.io/guides/topicals/spring-security-architecture#web-security
 	 */
-	@Override
+	@Override // used only to build a “local” AuthenticationManager, which would be a child of the global one
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailService);
+		// you can also configure with inmemoryAuthentication
+		auth.inMemoryAuthentication()
+			.withUser("blah")
+			.password("blah")
+			.roles("USER"); //help in role based authentication
+			
+	//configures the global (parent) AuthenticationManager:	
+	// you have autowire the @Autowired   DataSource dataSource;	
+	// using jdbcAuthentication
+		/*	 auth.jdbcAuthentication().dataSource(dataSource).withUser("dave")
+	      .password("secret").roles("USER");*/
 	}
 	
 	@SuppressWarnings("deprecation")
