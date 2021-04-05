@@ -15,7 +15,9 @@ import ca.kirti.jwt.api.Repository.UserRepository;
 
 @SpringBootApplication
 public class SpringSecurityJwtDemoApplication {
-
+	// https://spring.io/guides/gs/securing-web/
+	//https://www.youtube.com/watch?v=rBNOc4ymd1E&ab_channel=JavaTechie
+	//https://www.youtube.com/watch?v=payxWrmF_0k&list=PLqq-6Pq4lTTYTEooakHchTGglSvkZAjnE&index=5&ab_channel=JavaBrains
 	@Autowired
 	private UserRepository userRepo;
 	
